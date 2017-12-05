@@ -1,6 +1,7 @@
 # AgileTool
 It is a tool for management agile project
-##项目背景
+
+## 项目背景
 目前Agile项目管理当中使用JIRA是最好的。但是因为JIRA是收费的，所以想做一个轻量级的很简单的Agile项目管理的软件。功能没有那么多，但是可以很清晰的表示久可以了。
 
 ## 使用框架
