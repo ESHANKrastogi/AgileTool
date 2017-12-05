@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title> - 项目管理</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+
+    <link rel="shortcut icon" href="favicon.ico"> <link href="css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.css?v=4.4.0" rel="stylesheet">
+
+    <!-- Data Tables -->
+    <link href="css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="css/style.css?v=4.1.0" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico"> <link href="css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="css/style.css?v=4.1.0" rel="stylesheet">
+
+</head>
+
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+
+        <div class="row" style="display:none;" id="projectForm">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>添加项目</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <form >
+                            <div class="form-group">
+                                <label for="name">项目名称</label>
+                                <input type="text" class="form-control" id="name" placeholder="请输入项目名称">
+                            </div>
+                            <div class="form-group">
+                                <label for="description">项目描述</label>
+                                <input type="text" class="form-control" id="description" placeholder="请输入项目描述">
+                            </div>
+                            <div class="form-group">
+                                <label for="startTime">开始时间</label>
+                                <input type="text" class="form-control" id="startTime" data-mask="9999/99/99" placeholder="开始时间">
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="endTime">结束时间</label>
+                                <input type="text" class="form-control" id="endTime" data-mask="9999/99/99" placeholder="结束时间">
+                            </div>
+                            <div class="form-goup" id="member">
+                                <label for="chooseMember">选择成员</label>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-primary pull-right m-t-n-xs" onclick="addProject()"><strong>添 加</strong>
+                                </button>
+                                <label>
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>已有项目</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="table_data_tables.html#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="table_data_tables.html#">选项1</a>
+                                </li>
+                                <li><a href="table_data_tables.html#">选项2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="">
+                            <a data-toggle="modal" data-target="#addProject" class="btn btn-primary " onclick="projectForm()">添加项目</a>
+                        </div>
+                        <table class="table table-striped table-bordered table-hover " id="editable">
+                            <thead>
+                                <tr>
+                                    <th>项目名称</th>
+                                    <th>描述</th>
+                                    <th>项目负责人</th>
+                                    <th>开始时间</th>
+                                    <th>结束时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局js -->
+    <script src="js/jquery.min.js?v=2.1.4"></script>
+    <script src="js/bootstrap.min.js?v=3.3.6"></script>
+    <!-- Input Mask-->
+    <script src="js/plugins/jasny/jasny-bootstrap.min.js"></script>
+
+
+
+    <script src="js/plugins/jeditable/jquery.jeditable.js"></script>
+
+    <!-- Data Tables -->
+    <script src="js/plugins/dataTables/jquery.dataTables.js"></script>
+    <script src="js/plugins/dataTables/dataTables.bootstrap.js"></script>
+
+    <!-- 自定义js -->
+    <script src="js/content.js?v=1.0.0"></script>
+
+
+    <!-- Page-Level Scripts -->
+    <script>
+         $(document).ready(function(){
+            getAllUser();
+            getAllProject();
+         });
+
+        function projectForm(){
+            $("#projectForm").toggle();
+        }
+        function addProject(){
+            var projectName = $("#name").val();
+            var description = $("#description").val();
+            var startTime = $("#startTime").val();
+            var endTime = $("#endTime").val();
+            var member = findOutChooseBox();
+            $.post("/api/addProject",
+            {name:projectName,description:description,startTime:startTime,endTime:endTime,member:member},
+            function(result){
+                if(result.data==true){
+                    alert("add project success");
+
+                }else{
+                    alert("add project error! maybe the project is exist");
+                }
+            });
+        }
+
+        function findOutChooseBox(){
+              var checkboxes = document.getElementsByName('checkbox');
+              var value = new Array();
+              for(var i = 0;i<checkboxes.length;i++){
+                    if(checkboxes[i].checked){
+                        value.push(checkboxes[i].id);
+                    }
+              }
+              return value;
+        }
+
+
+
+        function getAllUser(){
+            $.get("/api/getAllUser",function(data){
+                $.each(data.data,function(n,value){
+                    var option = '<label class="checkbox-inline">'+
+                                 '<input type="checkbox" name="checkbox" value="option" id="'+value.id+'">'+value.account+
+                                 '</label>';
+                    $("#member").append(option);
+                });
+            });
+        }
+
+        function getAllProject(){
+            $('#editable').dataTable().fnClearTable();
+            $.get("/api/getAllProject",function(data){
+                $.each(data.data,function(n,value){
+                    var url = "<a onclick='deleteProject("+value.id+")'>删除</a>";
+                    $('#editable').dataTable().fnAddData([
+                        value.name,
+                        value.description,
+                        value.owner.lastName+" "+value.owner.firstName,
+                        value.startTime,
+                        value.endTime,
+                        url
+                    ]);
+                });
+            });
+        }
+
+        function deleteProject(id){
+            $.post("/api/deleteProject",{id:id},function(data){
+                  if(data.data==true){
+                         getAllProject();
+                  }
+            });
+        }
+
+
+
+    </script>
+</body>
+
+</html>
